@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+	<meta charset="utf8">
+
+	<title>Game</title>
+
+	<style type="text/css">
+
+		#canvas{
+
+			border: 1px solid gray;
+
+			width: 300px;
+
+			height: 250px;
+
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+
+
+<!-- 通信結果をここに表示 -->
+
+<div id="canvas"></div>
+
+
+
+<form id = "form">
+
+  <button type="button" id="start">ゲーム開始</button>
+
+</form>
+
+
+
+<script>
+var enemy;
+
+var canvas = document.querySelector("#canvas");
+
+var start  = document.querySelector("#start");
+
+start.addEventListener("click", function(){
+
+	document.querySelector("#form").innerHTML = '<button type="button" id="getHello">ガチャをひく</button>';
+
+	var request = new XMLHttpRequest();
+
+	request.open('GET', 'http://localhost/Data.php', false);
+
+	request.onload = function() {
+
+		if (request.status === 200) {
+
+			var response = request.responseText;
+
+			var json     = JSON.parse(response);
+
+
+			if(json.length==1){
+				enemy = json.[0];
+			}
+
+		}
+
+	};
+
+
+
+});
+
+var hello  = document.querySelector("#getHello");
+
+hello.addEventListener("click", function(){
+
+	var request = new XMLHttpRequest();
+
+	request.open('GET', 'http://localhost/Gacha.php?kaisuu='+5, false);
+
+	request.onload = function() {
+
+		if (request.status === 200) {
+
+			var response = request.responseText;
+
+			var json     = JSON.parse(response);
+
+
+
+			var str="";
+
+			for(var i=0; i<json.length; i++){
+
+				 str += '<img src="image/'+json[i]["id"]+'.png" width="100">';
+
+			}
+
+			canvas.innerHTML = str;
+
+		}
+
+	};
+
+	request.onerror = function() {
+
+		//エラー時の処理
+
+		canvas.innerHTML = "Error!";
+
+	};
+
+	//送信
+
+	request.send();		//POSTの場合は引数に文字列を渡す
+
+});
+
+
+
+function sleep (waitSec,callbackFunc){
+
+  var spanedSec = 0;
+
+  var id = setInterval(function(){
+
+    spanedSec++;
+
+    if(spanedSec>=waitSec){
+
+      clearInterval(id);
+
+      if(callbackFunc){
+
+        callbackFunc();
+
+      }
+
+    }
+
+  },1000);
+
+}
+
+</script>
+
+</body>
+
+</html>
